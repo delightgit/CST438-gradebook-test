@@ -89,6 +89,7 @@ public class GradeBookController {
 		return gradebook;
 	}
 	
+	// The teacher can use this to send final grades over to the registration service
 	@PostMapping("/course/{course_id}/finalgrades")
 	@Transactional
 	public void calcFinalGrades(@PathVariable int course_id) {
@@ -120,7 +121,7 @@ public class GradeBookController {
 			cdto.grades.add(gdto);
 			System.out.println("Course="+course_id+" Student="+e.getStudentEmail()+" grade="+gdto.grade);
 		}
-		
+		// this method needs to be filled in to integrate registration and gradebook
 		registrationService.sendFinalGrades(course_id, cdto);
 	}
 	
