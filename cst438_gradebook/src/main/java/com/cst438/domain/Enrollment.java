@@ -14,6 +14,8 @@ import javax.persistence.OneToMany;
 @Entity
 public class Enrollment {
 	
+	// if given a zero then DB will create the key
+	// if not, specific key will be given
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;

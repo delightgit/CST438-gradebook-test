@@ -5,15 +5,20 @@ import java.util.ArrayList;
 /*
  * a transfer object that is a list of assignment details
  */
+// to use the inner class, we need to use the outer class to refer to it
+// ex.) AssignmentListDTO.AssignmentDTO
 public class AssignmentListDTO {
-
+	
+	// inner class is one assignment
+	// instance of assignmentDTO(an array of assignments)
+	// could have been defined as a separate class, but since this class is small, we are putting it inside this outer class
 	public static class AssignmentDTO {
 		public int assignmentId;
 		public String assignmentName;
 		public String dueDate;
 		public String courseTitle;
 		public int courseId;
-
+		
 		public AssignmentDTO(int assignmentId, int courseId, String assignmentName, String dueDate,
 				String courseTitle) {
 			this.assignmentId = assignmentId;
@@ -59,12 +64,11 @@ public class AssignmentListDTO {
 			} else if (!dueDate.equals(other.dueDate))
 				return false;
 			return true;
-		}
-		
-		
+		}	
 		
 	}
-
+	
+	// holds the arraylist of AssignmentDTO
 	public ArrayList<AssignmentDTO> assignments = new ArrayList<>();
 
 	@Override
