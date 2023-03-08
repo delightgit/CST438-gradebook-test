@@ -3,6 +3,8 @@ package com.cst438;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.sql.Date;
 import java.util.Optional;
@@ -20,10 +22,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.cst438.controllers.AssignmentController;
 import com.cst438.domain.Assignment;
+import com.cst438.domain.AssignmentGradeRepository;
 import com.cst438.domain.AssignmentListDTO;
 import com.cst438.domain.AssignmentRepository;
 import com.cst438.domain.Course;
 import com.cst438.domain.CourseRepository;
+import com.cst438.services.RegistrationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
@@ -38,19 +42,25 @@ public class JunitTestAssignment {
 	public static final int COURSE_ID = 1234;
 
 	@MockBean
+	CourseRepository cRep;
+	
+	@MockBean
 	AssignmentRepository aRep;
 	
 	@MockBean
-	CourseRepository cRep;
+	AssignmentGradeRepository assignmentGradeRepository;
+
+	@MockBean
+	RegistrationService registrationService; // must have this to keep Spring test happy
+
 
 	@Autowired
 	private MockMvc mvc;
-	
 
 	@Test
 	public void createAssignment() throws Exception {
 		
-		MockHttpServletResponse response;
+		MockHttpServletResponse response; // HTTP response from the mock server
 		
 		// set up a test course
 		Course c = new Course();
@@ -86,68 +96,50 @@ public class JunitTestAssignment {
 		
 		MockHttpServletResponse response;
 		
-		// set up a test course
-		Course c = new Course();
-		c.setCourse_id(COURSE_ID);
 		
-		// define fake assignment object
 		Assignment a = new Assignment();
 		a.setId(TEST_ASSIGNMENT_ID);
 		
-		given(cRep.findById(COURSE_ID)).willReturn(Optional.of(c)); // returns a course object
-		given(aRep.save(any())).willReturn(a); // can pass in anything from the assignment repo
-		
-		// pass in an assignment DTO
-		// we don't really need a course title since the controller doesn't do anything with it
-		AssignmentListDTO.AssignmentDTO as = new AssignmentListDTO.AssignmentDTO(0, COURSE_ID, TEST_ASSIGNMENT_NAME, TEST_DUE_DATE, null);
+		given(aRep.findById(TEST_ASSIGNMENT_ID)).willReturn(Optional.of(a)); // can pass in anything from the assignment repo
+
 		// example of mvc perform
 		// send updates to server
 		response = mvc
-				.perform(MockMvcRequestBuilders.post("/assignment").accept(MediaType.APPLICATION_JSON)
-						.content(asJsonString(as)).contentType(MediaType.APPLICATION_JSON))
+				.perform(MockMvcRequestBuilders.delete("/assignment/"+TEST_ASSIGNMENT_ID))
 				.andReturn().getResponse();
 
 		// check the result with the assertequals methods
 		// verify that return status = OK (value 200)
 		assertEquals(200, response.getStatus());
-		
-		// simulated call to the controller and it returned and assignment DTO
-		AssignmentListDTO.AssignmentDTO result = fromJsonString(response.getContentAsString(), AssignmentListDTO.AssignmentDTO.class);
-        assertNotEquals(0, result.assignmentId); 
+        
+        //verify
+		verify(aRep, times(1)).delete(any()); // ???
+        
 	}
 	@Test
 	public void updateAssignmentName() throws Exception {
 		
-		MockHttpServletResponse response;
+		MockHttpServletResponse response; // HTTP response from the mock server
 		
-		// set up a test course
-		Course c = new Course();
-		c.setCourse_id(COURSE_ID);
-		
-		// define fake assignment object
 		Assignment a = new Assignment();
-		a.setId(TEST_ASSIGNMENT_ID);
+		a.setName("");
 		
-		given(cRep.findById(COURSE_ID)).willReturn(Optional.of(c)); // returns a course object
-		given(aRep.save(any())).willReturn(a); // can pass in anything from the assignment repo
-		
-		// pass in an assignment DTO
-		// we don't really need a course title since the controller doesn't do anything with it
+		given(aRep.findById(TEST_ASSIGNMENT_ID)).willReturn(Optional.of(a)); // can pass in anything from the assignment repo
+
 		AssignmentListDTO.AssignmentDTO as = new AssignmentListDTO.AssignmentDTO(0, COURSE_ID, TEST_ASSIGNMENT_NAME, TEST_DUE_DATE, null);
 		// example of mvc perform
 		// send updates to server
 		response = mvc
-				.perform(MockMvcRequestBuilders.post("/assignment").accept(MediaType.APPLICATION_JSON)
-						.content(asJsonString(as)).contentType(MediaType.APPLICATION_JSON))
-				.andReturn().getResponse();
+				.perform(MockMvcRequestBuilders.post("/assignment/"+TEST_ASSIGNMENT_ID).accept(MediaType.APPLICATION_JSON)
+				.content(asJsonString(as)).contentType(MediaType.APPLICATION_JSON))
+		.andReturn().getResponse();
 
 		// check the result with the assertequals methods
 		// verify that return status = OK (value 200)
 		assertEquals(200, response.getStatus());
-		
-		// simulated call to the controller and it returned and assignment DTO
-		AssignmentListDTO.AssignmentDTO result = fromJsonString(response.getContentAsString(), AssignmentListDTO.AssignmentDTO.class);
-        assertNotEquals(0, result.assignmentId); 
+        
+        //verify
+		verify(aRep, times(1)).save(any()); // ???
 	}
 	
 	private static String asJsonString(final Object obj) {

@@ -80,6 +80,8 @@ public class AssignmentController {
 	public void updateAssignmentName(@RequestBody AssignmentListDTO.AssignmentDTO assignment, @PathVariable int assignment_id) {
 		Assignment a = asRep.findById(assignment_id).orElse(null);
 		a.setName(assignment.assignmentName);
+		
+		
 		// just updating the object won't update the DB so we need to save it
 		asRep.save(a);
 	}
