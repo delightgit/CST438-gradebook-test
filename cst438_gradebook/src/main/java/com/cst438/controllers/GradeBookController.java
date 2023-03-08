@@ -163,12 +163,11 @@ public class GradeBookController {
 		if (assignment == null) {
 			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Assignment not found. "+assignmentId );
 		}
+		
 		// check that user is the course instructor
 		if (!assignment.getCourse().getInstructor().equals(email)) {
 			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
 		}
-		
 		return assignment;
 	}
-
 }
