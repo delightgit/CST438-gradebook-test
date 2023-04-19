@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import java.sql.Date;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -42,13 +42,13 @@ public class JunitTestAssignment {
 	public static final int COURSE_ID = 1234;
 
 	@MockBean
-	CourseRepository cRep;
-	
-	@MockBean
-	AssignmentRepository aRep;
-	
+	AssignmentRepository assignmentRepository;
+
 	@MockBean
 	AssignmentGradeRepository assignmentGradeRepository;
+
+	@MockBean
+	CourseRepository courseRepository; // must have this to keep Spring test happy
 
 	@MockBean
 	RegistrationService registrationService; // must have this to keep Spring test happy
@@ -70,8 +70,8 @@ public class JunitTestAssignment {
 		Assignment a = new Assignment();
 		a.setId(TEST_ASSIGNMENT_ID);
 		
-		given(cRep.findById(COURSE_ID)).willReturn(Optional.of(c)); // returns a course object
-		given(aRep.save(any())).willReturn(a); // can pass in anything from the assignment repo
+		given(courseRepository.findById(COURSE_ID)).willReturn(Optional.of(c)); // returns a course object
+		given(assignmentRepository.save(any())).willReturn(a); // can pass in anything from the assignment repo
 		
 		// pass in an assignment DTO
 		// we don't really need a course title since the controller doesn't do anything with it
@@ -91,6 +91,7 @@ public class JunitTestAssignment {
 		AssignmentListDTO.AssignmentDTO result = fromJsonString(response.getContentAsString(), AssignmentListDTO.AssignmentDTO.class);
         assertNotEquals(0, result.assignmentId); 
 	}
+	
 	@Test
 	public void deleteAssignment() throws Exception {
 		
@@ -100,7 +101,7 @@ public class JunitTestAssignment {
 		Assignment a = new Assignment();
 		a.setId(TEST_ASSIGNMENT_ID);
 		
-		given(aRep.findById(TEST_ASSIGNMENT_ID)).willReturn(Optional.of(a)); // can pass in anything from the assignment repo
+		given(assignmentRepository.findById(TEST_ASSIGNMENT_ID)).willReturn(Optional.of(a)); // can pass in anything from the assignment repo
 
 		// example of mvc perform
 		// send updates to server
@@ -113,7 +114,7 @@ public class JunitTestAssignment {
 		assertEquals(200, response.getStatus());
         
         //verify
-		verify(aRep, times(1)).delete(any()); // ???
+		verify(assignmentRepository, times(1)).delete(any()); // ???
         
 	}
 	@Test
@@ -124,7 +125,7 @@ public class JunitTestAssignment {
 		Assignment a = new Assignment();
 		a.setName("");
 		
-		given(aRep.findById(TEST_ASSIGNMENT_ID)).willReturn(Optional.of(a)); // can pass in anything from the assignment repo
+		given(assignmentRepository.findById(TEST_ASSIGNMENT_ID)).willReturn(Optional.of(a)); // can pass in anything from the assignment repo
 
 		AssignmentListDTO.AssignmentDTO as = new AssignmentListDTO.AssignmentDTO(0, COURSE_ID, TEST_ASSIGNMENT_NAME, TEST_DUE_DATE, null);
 		// example of mvc perform
@@ -139,7 +140,7 @@ public class JunitTestAssignment {
 		assertEquals(200, response.getStatus());
         
         //verify
-		verify(aRep, times(1)).save(any()); // ???
+		verify(assignmentRepository, times(1)).save(any()); // ???
 	}
 	
 	private static String asJsonString(final Object obj) {
