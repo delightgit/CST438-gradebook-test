@@ -77,6 +77,13 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- end selenium -->
+		<!--Debug selenium-->
+		<dependency>
+		  <groupId>org.seleniumhq.selenium</groupId>
+		  <artifactId>selenium-http-jdk-client</artifactId>
+		  <version>4.8.1</version>
+		</dependency>
+	<!-- end debug -->
 		
 	</dependencies>
 
